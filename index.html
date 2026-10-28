@@ -504,6 +504,155 @@
       flex-wrap: wrap;
     }
 
+    .pin-unlock {
+      display: none;
+      margin-bottom: 1rem;
+      padding: 1rem;
+      background: var(--bg-deep);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+
+    .pin-unlock.show { display: block; }
+
+    .pin-unlock label {
+      display: block;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 0.65rem;
+      text-align: center;
+    }
+
+    .pin-unlock-row {
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+      align-items: stretch;
+    }
+
+    .pin-unlock input {
+      width: 100%;
+      padding: 0.85rem 1rem;
+      background: var(--bg-elevated);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 12px;
+      color: var(--text);
+      font-size: 1.35rem;
+      letter-spacing: 0.45em;
+      text-align: center;
+      font-family: inherit;
+      outline: none;
+      -webkit-appearance: none;
+    }
+
+    .pin-unlock input:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px var(--gold-dim);
+    }
+
+    .pin-unlock #unlock-btn {
+      width: 100%;
+      padding: 0.9rem 1rem;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      border-radius: 12px;
+      min-height: 48px;
+    }
+
+    .pin-error {
+      color: #e07070;
+      font-size: 0.8rem;
+      margin-top: 0.45rem;
+      display: none;
+      text-align: center;
+    }
+
+    .locked-image-preview {
+      display: none;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    .locked-image-preview.show { display: block; }
+
+    .zoom-toolbar {
+      display: flex;
+      gap: 0.45rem;
+      justify-content: center;
+      margin-bottom: 0.65rem;
+      flex-wrap: wrap;
+    }
+
+    .zoom-toolbar button {
+      min-width: 44px;
+      padding: 0.45rem 0.75rem;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--bg-elevated);
+      color: var(--text);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .zoom-toolbar button:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+
+    .zoom-viewport {
+      position: relative;
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+      max-height: 55vh;
+      min-height: 180px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: #0a090e;
+      -webkit-user-select: none;
+      user-select: none;
+      -webkit-touch-callout: none;
+      touch-action: none;
+      cursor: grab;
+    }
+
+    .zoom-viewport.is-dragging {
+      cursor: grabbing;
+    }
+
+    .zoom-viewport img {
+      display: block;
+      margin: 0;
+      max-width: none;
+      height: auto;
+      -webkit-user-drag: none;
+      user-select: none;
+      pointer-events: none;
+    }
+
+    .zoom-hint {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      margin-top: 0.5rem;
+    }
+
+    .image-gen-preview {
+      margin-top: 0.75rem;
+      display: none;
+      text-align: center;
+    }
+
+    .image-gen-preview.show { display: block; }
+
+    .image-gen-preview img {
+      max-width: 100%;
+      max-height: 140px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+
     .how-to {
       max-width: 720px;
       margin: 0 auto 2.5rem;
@@ -646,6 +795,10 @@
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1"/></svg>
               Wi-Fi
             </button>
+            <button class="type-tab" data-type="image" title="Password-protected photo">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+              Image
+            </button>
           </div>
 
           <div class="form-section">
@@ -745,6 +898,24 @@
                 </select>
               </div>
             </div>
+
+            <div class="form-variant" id="form-image">
+              <h3>Password-protected photo</h3>
+              <div class="form-group">
+                <label for="image-file">Choose image from gallery</label>
+                <input type="file" id="image-file" accept="image/*" />
+                <p class="hint">Supports photos up to <strong>10 MB</strong>. Large files are uploaded; the QR only holds a locked link.</p>
+              </div>
+              <div class="image-gen-preview" id="image-gen-preview">
+                <img id="image-gen-thumb" alt="Selected preview" />
+              </div>
+              <div class="form-group">
+                <label for="image-pin">4-digit password (required)</label>
+                <input type="password" id="image-pin" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" placeholder="••••" autocomplete="off" />
+                <p class="hint">Any QR scanner can open the password page — photo shows only after the correct PIN.</p>
+              </div>
+              <p class="hint" id="image-size-hint" style="display:none;color:#e8d48b;"></p>
+            </div>
           </div>
 
           <div class="style-row">
@@ -815,7 +986,26 @@
         </div>
 
         <div class="scan-result" id="scan-result">
-          <h4>Scanned Result</h4>
+          <h4 id="scan-result-title">Scanned Result</h4>
+          <div class="pin-unlock" id="pin-unlock">
+            <label for="unlock-pin">This QR is password-protected. Enter the 4-digit PIN</label>
+            <div class="pin-unlock-row">
+              <input type="password" id="unlock-pin" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" placeholder="••••" autocomplete="off" enterkeyhint="go" />
+              <button class="btn btn-primary" id="unlock-btn" type="button">Enter / Go</button>
+            </div>
+            <p class="pin-error" id="pin-error">Incorrect password. Try again.</p>
+          </div>
+          <div class="locked-image-preview" id="locked-image-preview">
+            <div class="zoom-toolbar">
+              <button type="button" id="zoom-out" title="Zoom out">−</button>
+              <button type="button" id="zoom-reset" title="Reset">100%</button>
+              <button type="button" id="zoom-in" title="Zoom in">+</button>
+            </div>
+            <div class="zoom-viewport" id="zoom-viewport">
+              <img id="unlocked-image" alt="Unlocked photo" draggable="false" />
+            </div>
+            <p class="zoom-hint">Drag to move · pinch or + / − to zoom · saving is disabled</p>
+          </div>
           <div class="result-text" id="result-text"></div>
           <div class="result-actions">
             <button class="btn btn-primary" id="copy-result">Copy</button>
@@ -857,9 +1047,18 @@
 
   <script>
     const WATERMARK = '100, 000 000 000';
+    const QRIMG_PREFIX = 'QRIMG1|';
+    const QRLOC_PREFIX = 'QRLOC1|';
+    const QRURL_PREFIX = 'QRURL1|';
+    const QR_MAX_CHARS = 2900;
+    const MAX_IMAGE_BYTES = 10 * 1024 * 1024; // 10 MB
     let currentType = 'url';
     let html5QrCode = null;
     let cameraRunning = false;
+    let pendingImagePayload = null;
+    let pendingLockedCipher = null;
+    let pendingLockedMode = null; // 'embed' | 'url' | 'local'
+    let pendingLocalId = null;
 
     // DOM
     const qrContainer = document.getElementById('qrcode');
@@ -912,6 +1111,292 @@
     bgHex.addEventListener('change', () => {
       if (/^#[0-9A-Fa-f]{6}$/.test(bgHex.value)) { bgColor.value = bgHex.value; generateQR(); }
     });
+
+    function xorCrypt(str, pin) {
+      var out = '';
+      for (var i = 0; i < str.length; i++) {
+        out += String.fromCharCode(str.charCodeAt(i) ^ pin.charCodeAt(i % pin.length));
+      }
+      return out;
+    }
+
+    function toBase64Url(str) {
+      return btoa(str).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    }
+
+    function fromBase64Url(str) {
+      str = str.replace(/-/g, '+').replace(/_/g, '/');
+      while (str.length % 4) str += '=';
+      return atob(str);
+    }
+
+    function compressImageFile(file, maxSide, quality) {
+      return new Promise(function (resolve, reject) {
+        var reader = new FileReader();
+        reader.onload = function () {
+          var img = new Image();
+          img.onload = function () {
+            var w = img.width;
+            var h = img.height;
+            var scale = Math.min(1, maxSide / Math.max(w, h));
+            var cw = Math.max(1, Math.round(w * scale));
+            var ch = Math.max(1, Math.round(h * scale));
+            var canvas = document.createElement('canvas');
+            canvas.width = cw;
+            canvas.height = ch;
+            var ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, cw, ch);
+            resolve(canvas.toDataURL('image/jpeg', quality));
+          };
+          img.onerror = function () { reject(new Error('Could not load image')); };
+          img.src = reader.result;
+        };
+        reader.onerror = function () { reject(new Error('Could not read file')); };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function fileToThumb(file) {
+      return compressImageFile(file, 200, 0.6).catch(function () { return null; });
+    }
+
+    // Unlock page: mode "img" = embedded data URL, mode "url" = remote https link
+    function buildUnlockPage(cipher, mode) {
+      mode = mode || 'img';
+      var check = mode === 'url'
+        ? 'if(t.indexOf("http")!==0)throw 1;var im=document.getElementById("i");im.src=t;im.style.display="block";'
+        : 'if(t.indexOf("data:image/")!==0)throw 1;var im=document.getElementById("i");im.src=t;im.style.display="block";';
+      var html = '<!DOCTYPE html><html><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1">' +
+        '<title>Protected Photo</title><style>' +
+        '*{box-sizing:border-box}body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;' +
+        'background:#0c0b10;color:#f5f2eb;font-family:system-ui,sans-serif;padding:16px}' +
+        '.c{background:#16141c;border:1px solid rgba(201,162,39,.3);border-radius:16px;padding:24px;max-width:360px;width:100%;text-align:center}' +
+        'h1{font-size:18px;margin:0 0 8px;color:#e8d48b}p{color:#a39e93;font-size:14px;margin:0 0 16px}' +
+        'input{width:100%;padding:12px;font-size:22px;letter-spacing:.4em;text-align:center;border-radius:10px;' +
+        'border:1px solid #333;background:#1e1b26;color:#fff;margin-bottom:12px}' +
+        'button{width:100%;padding:12px;border:0;border-radius:10px;background:linear-gradient(135deg,#c9a227,#a67c00);' +
+        'color:#0c0b10;font-weight:700;font-size:16px;cursor:pointer}.e{color:#e07070;font-size:13px;margin-top:8px;display:none}' +
+        'img{max-width:100%;border-radius:12px;margin-top:16px}</style></head><body><div class=c>' +
+        '<h1>Protected Photo</h1><p>Enter the 4-digit password to view</p>' +
+        '<input id=p maxlength=4 inputmode=numeric placeholder="••••" autocomplete=off>' +
+        '<button type=button id=b>Unlock</button><p class=e id=e>Incorrect password</p><img id=i style=display:none alt="">' +
+        '</div><script>(function(){var C="' + cipher + '";' +
+        'function x(s,p){var o="",i=0;for(;i<s.length;i++)o+=String.fromCharCode(s.charCodeAt(i)^p.charCodeAt(i%p.length));return o}' +
+        'function d(s){s=s.replace(/-/g,"+").replace(/_/g,"/");while(s.length%4)s+="=";return atob(s)}' +
+        'function u(){var p=document.getElementById("p").value,e=document.getElementById("e");e.style.display="none";' +
+        'if(!/^\\d{4}$/.test(p)){e.style.display="block";e.textContent="Enter 4 digits";return}' +
+        'try{var t=x(d(C),p);' + check +
+        'document.getElementById("p").style.display="none";document.getElementById("b").style.display="none"}' +
+        'catch(err){e.style.display="block";e.textContent="Incorrect password"}}' +
+        'document.getElementById("b").onclick=u;document.getElementById("p").onkeydown=function(ev){if(ev.key==="Enter")u()}' +
+        '})();<\/script></body></html>';
+      try {
+        return 'data:text/html;base64,' + btoa(unescape(encodeURIComponent(html)));
+      } catch (e) {
+        return 'data:text/html;charset=utf-8,' + encodeURIComponent(html);
+      }
+    }
+
+    async function uploadImageFile(file) {
+      // Try free anonymous hosts (large files OK). Returns https URL or null.
+      var hosts = [
+        {
+          name: 'litterbox',
+          run: async function () {
+            var fd = new FormData();
+            fd.append('reqtype', 'fileupload');
+            fd.append('time', '72h');
+            fd.append('fileToUpload', file, file.name || 'photo.jpg');
+            var r = await fetch('https://litterbox.catbox.moe/resources/internals/api.php', { method: 'POST', body: fd });
+            var t = (await r.text()).trim();
+            if (/^https?:\/\//i.test(t)) return t;
+            throw new Error(t || 'litterbox failed');
+          }
+        },
+        {
+          name: 'catbox',
+          run: async function () {
+            var fd = new FormData();
+            fd.append('reqtype', 'fileupload');
+            fd.append('fileToUpload', file, file.name || 'photo.jpg');
+            var r = await fetch('https://catbox.moe/user/api.php', { method: 'POST', body: fd });
+            var t = (await r.text()).trim();
+            if (/^https?:\/\//i.test(t)) return t;
+            throw new Error(t || 'catbox failed');
+          }
+        },
+        {
+          name: '0x0',
+          run: async function () {
+            var fd = new FormData();
+            fd.append('file', file, file.name || 'photo.jpg');
+            var r = await fetch('https://0x0.st', { method: 'POST', body: fd });
+            var t = (await r.text()).trim();
+            if (/^https?:\/\//i.test(t)) return t;
+            throw new Error(t || '0x0 failed');
+          }
+        }
+      ];
+      for (var i = 0; i < hosts.length; i++) {
+        try {
+          var url = await hosts[i].run();
+          if (url) return url;
+        } catch (e) {
+          console.warn('upload via ' + hosts[i].name + ' failed', e);
+        }
+      }
+      return null;
+    }
+
+    function openImageDB() {
+      return new Promise(function (resolve, reject) {
+        var req = indexedDB.open('QRProtectedImages', 1);
+        req.onupgradeneeded = function () {
+          var db = req.result;
+          if (!db.objectStoreNames.contains('images')) {
+            db.createObjectStore('images', { keyPath: 'id' });
+          }
+        };
+        req.onsuccess = function () { resolve(req.result); };
+        req.onerror = function () { reject(req.error); };
+      });
+    }
+
+    async function storeLocalImage(file, pin) {
+      var id = 'img_' + Date.now() + '_' + Math.random().toString(36).slice(2, 9);
+      var buf = await file.arrayBuffer();
+      var db = await openImageDB();
+      await new Promise(function (resolve, reject) {
+        var tx = db.transaction('images', 'readwrite');
+        tx.objectStore('images').put({
+          id: id,
+          pin: pin,
+          type: file.type || 'image/jpeg',
+          data: buf,
+          created: Date.now()
+        });
+        tx.oncomplete = function () { resolve(); };
+        tx.onerror = function () { reject(tx.error); };
+      });
+      return id;
+    }
+
+    async function loadLocalImage(id) {
+      var db = await openImageDB();
+      return new Promise(function (resolve, reject) {
+        var tx = db.transaction('images', 'readonly');
+        var req = tx.objectStore('images').get(id);
+        req.onsuccess = function () { resolve(req.result || null); };
+        req.onerror = function () { reject(req.error); };
+      });
+    }
+
+    async function prepareImagePayload() {
+      pendingImagePayload = null;
+      pendingLockedMode = null;
+      pendingLocalId = null;
+
+      var fileInput = document.getElementById('image-file');
+      var pinEl = document.getElementById('image-pin');
+      var hint = document.getElementById('image-size-hint');
+      var preview = document.getElementById('image-gen-preview');
+      var thumb = document.getElementById('image-gen-thumb');
+      hint.style.display = 'none';
+      hint.textContent = '';
+      hint.style.color = '';
+
+      var file = fileInput.files && fileInput.files[0];
+      var pin = (pinEl.value || '').trim();
+
+      if (!file) return null;
+      if (file.size > MAX_IMAGE_BYTES) {
+        hint.style.display = 'block';
+        hint.style.color = '#e07070';
+        hint.textContent = 'File is over 10 MB. Please choose a smaller photo.';
+        return null;
+      }
+      if (!/^\d{4}$/.test(pin)) {
+        hint.style.display = 'block';
+        hint.style.color = '#e8d48b';
+        hint.textContent = 'Enter a 4-digit password (0–9 only).';
+        return null;
+      }
+
+      // Thumbnail for UI
+      var thumbUrl = await fileToThumb(file);
+      if (thumbUrl) {
+        thumb.src = thumbUrl;
+        preview.classList.add('show');
+      }
+
+      // --- Path A: small enough to embed (offline, no upload) ---
+      if (file.size <= 80 * 1024) {
+        var attempts = [
+          { side: 160, q: 0.45 }, { side: 120, q: 0.35 }, { side: 96, q: 0.28 },
+          { side: 72, q: 0.22 }, { side: 56, q: 0.18 }, { side: 40, q: 0.15 }
+        ];
+        for (var i = 0; i < attempts.length; i++) {
+          try {
+            var dataUrl = await compressImageFile(file, attempts[i].side, attempts[i].q);
+            var cipher = toBase64Url(xorCrypt(dataUrl, pin));
+            var candidate = buildUnlockPage(cipher, 'img');
+            if (candidate.length <= QR_MAX_CHARS) {
+              pendingImagePayload = candidate;
+              pendingLockedMode = 'embed';
+              hint.style.display = 'block';
+              hint.style.color = 'var(--gold-soft)';
+              hint.textContent = 'Ready (embedded, offline). Scan → password page → photo.';
+              return candidate;
+            }
+          } catch (e) { console.warn(e); }
+        }
+      }
+
+      // --- Path B: upload large image (3.5 MB+ OK), QR holds locked URL only ---
+      hint.style.display = 'block';
+      hint.style.color = 'var(--gold-soft)';
+      hint.textContent = 'Uploading photo for locked QR…';
+      showToast('Uploading photo…');
+
+      var remoteUrl = null;
+      try {
+        remoteUrl = await uploadImageFile(file);
+      } catch (e) {
+        console.warn(e);
+      }
+
+      if (remoteUrl) {
+        var urlCipher = toBase64Url(xorCrypt(remoteUrl, pin));
+        var page = buildUnlockPage(urlCipher, 'url');
+        // Compact fallback for our app
+        if (page.length > QR_MAX_CHARS) {
+          page = QRURL_PREFIX + urlCipher;
+        }
+        pendingImagePayload = page;
+        pendingLockedMode = 'url';
+        hint.textContent = 'Ready (full quality, ~' + (file.size / (1024 * 1024)).toFixed(1) + ' MB). Scan any QR app → enter PIN → photo.';
+        showToast('Photo locked into QR');
+        return page;
+      }
+
+      // --- Path C: local-only (same browser) when upload blocked ---
+      try {
+        var localId = await storeLocalImage(file, pin);
+        pendingLocalId = localId;
+        var localPayload = QRLOC_PREFIX + localId;
+        pendingImagePayload = localPayload;
+        pendingLockedMode = 'local';
+        hint.style.color = '#e8d48b';
+        hint.textContent = 'Saved on this device only (upload unavailable). Scan with this same app/browser to unlock.';
+        showToast('Saved locally — use this app to unlock');
+        return localPayload;
+      } catch (e) {
+        console.warn(e);
+        hint.style.color = '#e07070';
+        hint.textContent = 'Could not prepare image. Check network (for large photos) or try a smaller file.';
+        return null;
+      }
+    }
 
     function getPayload() {
       switch (currentType) {
@@ -969,6 +1454,8 @@
           const enc = document.getElementById('wifi-encryption').value;
           return 'WIFI:T:' + enc + ';S:' + ssid + ';P:' + pass + ';;';
         }
+        case 'image':
+          return pendingImagePayload;
         default:
           return null;
       }
@@ -1003,6 +1490,10 @@
       holder.style.cssText = 'position:absolute;left:-9999px;top:0;';
       document.body.appendChild(holder);
 
+      // Long payloads (locked photos) need lower error correction for capacity
+      var ecLevel = payload.length > 800 ? QRCode.CorrectLevel.L : QRCode.CorrectLevel.M;
+      if (payload.length > 2000) ecLevel = QRCode.CorrectLevel.L;
+
       try {
         new QRCode(holder, {
           text: payload,
@@ -1010,11 +1501,18 @@
           height: 220,
           colorDark: fg,
           colorLight: bg,
-          correctLevel: QRCode.CorrectLevel.H
+          correctLevel: ecLevel
         });
       } catch (e) {
-        document.body.removeChild(holder);
-        qrContainer.innerHTML = '<div style="color:#c44;padding:1rem;text-align:center;">Could not generate QR</div>';
+        console.warn(e);
+        if (holder.parentNode) document.body.removeChild(holder);
+        var msg = 'Could not generate QR';
+        if (payload.length > 1500) {
+          msg = 'Data too large for QR. Use a smaller photo or lower detail.';
+        }
+        qrContainer.innerHTML = '<div style="color:#c44;padding:1rem;text-align:center;font-size:0.85rem;">' + msg + '</div>';
+        downloadPngBtn.disabled = true;
+        downloadSvgBtn.disabled = true;
         return;
       }
 
@@ -1131,9 +1629,34 @@
       }
     });
 
-    generateBtn.addEventListener('click', () => {
+    document.getElementById('image-file').addEventListener('change', function () {
+      var f = this.files && this.files[0];
+      pendingImagePayload = null;
+      if (f) {
+        fileToThumb(f).then(function (url) {
+          if (url) {
+            document.getElementById('image-gen-thumb').src = url;
+            document.getElementById('image-gen-preview').classList.add('show');
+          }
+        });
+        var hint = document.getElementById('image-size-hint');
+        hint.style.display = 'block';
+        hint.style.color = 'var(--gold-soft)';
+        hint.textContent = 'Selected: ' + (f.size / (1024 * 1024)).toFixed(2) + ' MB — set PIN and press Generate.';
+      }
+    });
+    document.getElementById('image-pin').addEventListener('input', function () {
+      this.value = this.value.replace(/\D/g, '').slice(0, 4);
+    });
+
+    generateBtn.addEventListener('click', async function () {
+      if (currentType === 'image') {
+        showToast('Preparing locked image…');
+        await prepareImagePayload();
+      }
       doGenerate();
-      showToast('QR Code generated');
+      if (getPayload()) showToast('QR Code generated');
+      else if (currentType === 'image') showToast('Add a photo and a 4-digit PIN first');
     });
 
     // ========== QR READER ==========
@@ -1166,12 +1689,95 @@
       }
     }
 
+    function resetScanPanels() {
+      document.getElementById('pin-unlock').classList.remove('show');
+      document.getElementById('locked-image-preview').classList.remove('show');
+      document.getElementById('pin-error').style.display = 'none';
+      document.getElementById('unlock-pin').value = '';
+      document.getElementById('unlocked-image').removeAttribute('src');
+      document.getElementById('result-text').style.display = 'block';
+      document.getElementById('scan-result-title').textContent = 'Scanned Result';
+      pendingLockedCipher = null;
+      pendingLockedMode = null;
+      pendingLocalId = null;
+    }
+
     function showScanResult(text) {
       const box = document.getElementById('scan-result');
       const resultEl = document.getElementById('result-text');
       const openBtn = document.getElementById('open-result');
-      resultEl.textContent = text;
+      resetScanPanels();
       box.classList.add('show');
+
+      // Password-protected: universal data:text/html unlock page
+      if (text && text.indexOf('data:text/html') === 0) {
+        document.getElementById('scan-result-title').textContent = 'Protected Photo';
+        resultEl.textContent = 'Password page detected. Enter PIN below or open the password page.';
+        resultEl.style.display = 'block';
+        openBtn.style.display = 'inline-flex';
+        openBtn.textContent = 'Open password page';
+        openBtn.onclick = function () {
+          window.open(text, '_blank', 'noopener,noreferrer');
+        };
+        document.getElementById('copy-result').style.display = 'none';
+        try { window.open(text, '_blank', 'noopener,noreferrer'); } catch (e) {}
+        try {
+          var m = text.match(/var C="([A-Za-z0-9\-_]+)"/);
+          if (m && m[1]) {
+            pendingLockedCipher = m[1];
+            pendingLockedMode = 'auto';
+            document.getElementById('pin-unlock').classList.add('show');
+          }
+        } catch (e2) {}
+        showToast('Protected photo — enter password');
+        return;
+      }
+
+      // Remote URL locked in compact form
+      if (text && text.indexOf(QRURL_PREFIX) === 0) {
+        pendingLockedCipher = text.slice(QRURL_PREFIX.length);
+        pendingLockedMode = 'url';
+        document.getElementById('scan-result-title').textContent = 'Protected Photo';
+        document.getElementById('pin-unlock').classList.add('show');
+        resultEl.textContent = 'Enter the 4-digit password to load the photo.';
+        resultEl.style.display = 'block';
+        openBtn.style.display = 'none';
+        document.getElementById('copy-result').style.display = 'none';
+        showToast('Protected QR — enter password');
+        return;
+      }
+
+      // Local-only (same browser IndexedDB)
+      if (text && text.indexOf(QRLOC_PREFIX) === 0) {
+        pendingLocalId = text.slice(QRLOC_PREFIX.length);
+        pendingLockedMode = 'local';
+        document.getElementById('scan-result-title').textContent = 'Protected Photo (this device)';
+        document.getElementById('pin-unlock').classList.add('show');
+        resultEl.textContent = 'Enter the 4-digit password to view the photo stored on this device.';
+        resultEl.style.display = 'block';
+        openBtn.style.display = 'none';
+        document.getElementById('copy-result').style.display = 'none';
+        showToast('Protected QR — enter password');
+        return;
+      }
+
+      // Legacy embed format
+      if (text && text.indexOf(QRIMG_PREFIX) === 0) {
+        pendingLockedCipher = text.slice(QRIMG_PREFIX.length);
+        pendingLockedMode = 'embed';
+        document.getElementById('scan-result-title').textContent = 'Protected Photo';
+        document.getElementById('pin-unlock').classList.add('show');
+        resultEl.textContent = 'Content is locked. Enter the 4-digit password set by the creator.';
+        resultEl.style.display = 'block';
+        openBtn.style.display = 'none';
+        document.getElementById('copy-result').style.display = 'none';
+        showToast('Protected QR — enter password to unlock');
+        return;
+      }
+
+      document.getElementById('copy-result').style.display = 'inline-flex';
+      resultEl.textContent = text;
+      resultEl.style.display = 'block';
 
       const isUrl = /^https?:\/\//i.test(text) || /^www\./i.test(text);
       openBtn.style.display = isUrl ? 'inline-flex' : 'none';
@@ -1183,6 +1789,237 @@
 
       showToast('QR code scanned!');
     }
+
+    var imageZoom = 1;
+    var imageBaseWidth = 0;
+
+    function applyImageZoom(centerOnViewport) {
+      var img = document.getElementById('unlocked-image');
+      var vp = document.getElementById('zoom-viewport');
+      var label = document.getElementById('zoom-reset');
+      if (!img || !vp) return;
+
+      // Use real layout size so overflow scroll works in every direction
+      if (!imageBaseWidth) {
+        imageBaseWidth = vp.clientWidth || img.naturalWidth || 300;
+      }
+      var w = Math.max(40, Math.round(imageBaseWidth * imageZoom));
+      img.style.width = w + 'px';
+      img.style.height = 'auto';
+      img.style.maxWidth = 'none';
+      img.style.transform = 'none';
+
+      if (label) label.textContent = Math.round(imageZoom * 100) + '%';
+
+      if (centerOnViewport) {
+        // Keep view roughly centered after zoom change
+        var maxScrollX = Math.max(0, vp.scrollWidth - vp.clientWidth);
+        var maxScrollY = Math.max(0, vp.scrollHeight - vp.clientHeight);
+        vp.scrollLeft = maxScrollX / 2;
+        vp.scrollTop = maxScrollY / 2;
+      }
+    }
+
+    function setImageZoom(z, center) {
+      imageZoom = Math.max(0.5, Math.min(5, z));
+      applyImageZoom(!!center);
+    }
+
+    function showUnlockedImage(src) {
+      var img = document.getElementById('unlocked-image');
+      var vp = document.getElementById('zoom-viewport');
+      imageZoom = 1;
+      imageBaseWidth = 0;
+      img.onload = function () {
+        imageBaseWidth = vp.clientWidth || Math.min(img.naturalWidth, 400);
+        applyImageZoom(true);
+      };
+      img.src = src;
+      if (img.complete) {
+        imageBaseWidth = vp.clientWidth || Math.min(img.naturalWidth, 400);
+        applyImageZoom(true);
+      }
+      document.getElementById('locked-image-preview').classList.add('show');
+      document.getElementById('pin-unlock').classList.remove('show');
+      document.getElementById('result-text').style.display = 'none';
+      document.getElementById('copy-result').style.display = 'none';
+      document.getElementById('open-result').style.display = 'none';
+      document.getElementById('scan-result-title').textContent = 'Photo unlocked';
+      showToast('Photo unlocked — drag to pan, + / − to zoom');
+    }
+
+    document.getElementById('zoom-in').addEventListener('click', function () {
+      setImageZoom(imageZoom + 0.25, true);
+    });
+    document.getElementById('zoom-out').addEventListener('click', function () {
+      setImageZoom(imageZoom - 0.25, true);
+    });
+    document.getElementById('zoom-reset').addEventListener('click', function () {
+      setImageZoom(1, true);
+    });
+
+    // Pan (drag) + pinch zoom + block save
+    (function () {
+      var vp = document.getElementById('zoom-viewport');
+      var img = document.getElementById('unlocked-image');
+      if (!vp) return;
+
+      function block(e) { e.preventDefault(); return false; }
+      if (img) {
+        img.addEventListener('contextmenu', block);
+        img.addEventListener('dragstart', block);
+      }
+      vp.addEventListener('contextmenu', block);
+
+      // Mouse drag to pan
+      var dragging = false;
+      var startX = 0, startY = 0, scrollLeft0 = 0, scrollTop0 = 0;
+
+      vp.addEventListener('mousedown', function (e) {
+        if (e.button !== 0) return;
+        dragging = true;
+        vp.classList.add('is-dragging');
+        startX = e.clientX;
+        startY = e.clientY;
+        scrollLeft0 = vp.scrollLeft;
+        scrollTop0 = vp.scrollTop;
+        e.preventDefault();
+      });
+      window.addEventListener('mousemove', function (e) {
+        if (!dragging) return;
+        vp.scrollLeft = scrollLeft0 - (e.clientX - startX);
+        vp.scrollTop = scrollTop0 - (e.clientY - startY);
+      });
+      window.addEventListener('mouseup', function () {
+        dragging = false;
+        vp.classList.remove('is-dragging');
+      });
+
+      // Touch: one finger pan, two finger pinch
+      var lastDist = 0;
+      var touchPan = false;
+      var tStartX = 0, tStartY = 0, tScrollL = 0, tScrollT = 0;
+
+      vp.addEventListener('touchstart', function (e) {
+        if (e.touches.length === 1) {
+          touchPan = true;
+          lastDist = 0;
+          tStartX = e.touches[0].clientX;
+          tStartY = e.touches[0].clientY;
+          tScrollL = vp.scrollLeft;
+          tScrollT = vp.scrollTop;
+        } else if (e.touches.length === 2) {
+          touchPan = false;
+          var dx = e.touches[0].clientX - e.touches[1].clientX;
+          var dy = e.touches[0].clientY - e.touches[1].clientY;
+          lastDist = Math.sqrt(dx * dx + dy * dy);
+        }
+      }, { passive: true });
+
+      vp.addEventListener('touchmove', function (e) {
+        if (e.touches.length === 1 && touchPan) {
+          e.preventDefault();
+          vp.scrollLeft = tScrollL - (e.touches[0].clientX - tStartX);
+          vp.scrollTop = tScrollT - (e.touches[0].clientY - tStartY);
+        } else if (e.touches.length === 2 && lastDist > 0) {
+          e.preventDefault();
+          var dx = e.touches[0].clientX - e.touches[1].clientX;
+          var dy = e.touches[0].clientY - e.touches[1].clientY;
+          var dist = Math.sqrt(dx * dx + dy * dy);
+          var scale = dist / lastDist;
+          lastDist = dist;
+          setImageZoom(imageZoom * scale, false);
+        }
+      }, { passive: false });
+
+      vp.addEventListener('touchend', function () {
+        touchPan = false;
+        lastDist = 0;
+      });
+    })();
+
+    function tryUnlockImage() {
+      var pin = (document.getElementById('unlock-pin').value || '').trim();
+      var err = document.getElementById('pin-error');
+      err.style.display = 'none';
+      if (!/^\d{4}$/.test(pin)) {
+        err.textContent = 'Enter a valid 4-digit password.';
+        err.style.display = 'block';
+        return;
+      }
+
+      // Local IndexedDB image
+      if (pendingLockedMode === 'local' && pendingLocalId) {
+        loadLocalImage(pendingLocalId).then(function (rec) {
+          if (!rec || rec.pin !== pin) {
+            err.textContent = 'Incorrect password. Try again.';
+            err.style.display = 'block';
+            return;
+          }
+          var blob = new Blob([rec.data], { type: rec.type || 'image/jpeg' });
+          showUnlockedImage(URL.createObjectURL(blob));
+        }).catch(function () {
+          err.textContent = 'Photo not found on this device.';
+          err.style.display = 'block';
+        });
+        return;
+      }
+
+      if (!pendingLockedCipher) {
+        err.textContent = 'Nothing to unlock.';
+        err.style.display = 'block';
+        return;
+      }
+
+      try {
+        var plain = xorCrypt(fromBase64Url(pendingLockedCipher), pin);
+        // Remote URL
+        if (/^https?:\/\//i.test(plain) || pendingLockedMode === 'url') {
+          if (!/^https?:\/\//i.test(plain)) {
+            err.textContent = 'Incorrect password. Try again.';
+            err.style.display = 'block';
+            return;
+          }
+          showUnlockedImage(plain);
+          return;
+        }
+        // Embedded data URL
+        if (/^data:image\//i.test(plain)) {
+          showUnlockedImage(plain);
+          return;
+        }
+        // Auto mode from data:text/html page cipher
+        if (pendingLockedMode === 'auto') {
+          if (/^https?:\/\//i.test(plain) || /^data:image\//i.test(plain)) {
+            showUnlockedImage(plain);
+            return;
+          }
+        }
+        err.textContent = 'Incorrect password. Try again.';
+        err.style.display = 'block';
+      } catch (e) {
+        err.textContent = 'Incorrect password. Try again.';
+        err.style.display = 'block';
+      }
+    }
+
+    document.getElementById('unlock-btn').addEventListener('click', function (e) {
+      e.preventDefault();
+      tryUnlockImage();
+    });
+    document.getElementById('unlock-pin').addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === 'Go') {
+        e.preventDefault();
+        tryUnlockImage();
+      }
+    });
+    document.getElementById('unlock-pin').addEventListener('input', function () {
+      this.value = this.value.replace(/\D/g, '').slice(0, 4);
+      // Auto-submit when 4 digits entered
+      if (this.value.length === 4) {
+        tryUnlockImage();
+      }
+    });
 
     function copyTextToClipboard(text) {
       if (!text) return Promise.reject(new Error('empty'));
@@ -1243,6 +2080,8 @@
     document.getElementById('clear-result').addEventListener('click', () => {
       document.getElementById('scan-result').classList.remove('show');
       document.getElementById('result-text').textContent = '';
+      document.getElementById('copy-result').style.display = 'inline-flex';
+      resetScanPanels();
     });
 
     function showCameraStatus(message) {
