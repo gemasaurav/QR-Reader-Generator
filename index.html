@@ -1009,7 +1009,8 @@
           <div class="result-text" id="result-text"></div>
           <div class="result-actions">
             <button class="btn btn-primary" id="copy-result">Copy</button>
-            <button class="btn btn-secondary" id="open-result" style="display:none;">Open Link</button>
+            <button class="btn btn-primary" id="open-result" style="display:none;">Open Link</button>
+            <button class="btn btn-secondary" id="open-external" style="display:none;">Open in Browser</button>
             <button class="btn btn-secondary" id="clear-result">Clear</button>
           </div>
         </div>
@@ -1676,12 +1677,82 @@
       });
     });
 
+    function vibrateOnScan() {
+      try {
+        if (navigator.vibrate) {
+          navigator.vibrate([80, 40, 80]);
+        }
+      } catch (e) {}
+    }
+
+    // Open outside the in-app WebView when possible (Chrome / system browser)
+    function openExternally(url) {
+      if (!url) return;
+      try {
+        // Cordova / some WebView wrappers
+        if (window.cordova && window.cordova.InAppBrowser) {
+          window.cordova.InAppBrowser.open(url, '_system');
+          return;
+        }
+        if (navigator.app && typeof navigator.app.loadUrl === 'function') {
+          navigator.app.loadUrl(url, { openExternal: true });
+          return;
+        }
+      } catch (e) {}
+
+      try {
+        // Android intent to force external browser for http(s)
+        if (/android/i.test(navigator.userAgent) && /^https?:\/\//i.test(url)) {
+          var noScheme = url.replace(/^https?:\/\//i, '');
+          var scheme = /^https/i.test(url) ? 'https' : 'http';
+          var intentUrl = 'intent://' + noScheme +
+            '#Intent;scheme=' + scheme +
+            ';action=android.intent.action.VIEW' +
+            ';category=android.intent.category.BROWSABLE' +
+            ';end';
+          var aIntent = document.createElement('a');
+          aIntent.href = intentUrl;
+          aIntent.style.display = 'none';
+          document.body.appendChild(aIntent);
+          aIntent.click();
+          document.body.removeChild(aIntent);
+          // Also try normal open as fallback after a beat
+          setTimeout(function () {
+            try {
+              var a2 = document.createElement('a');
+              a2.href = url;
+              a2.target = '_blank';
+              a2.rel = 'noopener noreferrer';
+              document.body.appendChild(a2);
+              a2.click();
+              document.body.removeChild(a2);
+            } catch (e2) {}
+          }, 400);
+          return;
+        }
+      } catch (e3) {}
+
+      try {
+        var a = document.createElement('a');
+        a.href = url;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      } catch (e4) {
+        try { window.open(url, '_blank'); } catch (e5) {
+          try { window.location.href = url; } catch (e6) {}
+        }
+      }
+    }
+
     function onScanSuccess(decodedText) {
       showScanResult(decodedText);
-      // Optional: pause after successful scan on camera
+      // Pause briefly so the same code is not scanned repeatedly
       if (cameraRunning && html5QrCode) {
-        html5QrCode.pause(true);
-        setTimeout(() => {
+        try { html5QrCode.pause(true); } catch (e) {}
+        setTimeout(function () {
           if (cameraRunning && html5QrCode) {
             try { html5QrCode.resume(); } catch (e) {}
           }
@@ -1700,27 +1771,53 @@
       pendingLockedCipher = null;
       pendingLockedMode = null;
       pendingLocalId = null;
+      var openBtn = document.getElementById('open-result');
+      var extBtn = document.getElementById('open-external');
+      if (openBtn) {
+        openBtn.style.display = 'none';
+        openBtn.onclick = null;
+      }
+      if (extBtn) {
+        extBtn.style.display = 'none';
+        extBtn.onclick = null;
+      }
+    }
+
+    function wireOpenButtons(url, labelInApp, labelExternal) {
+      var openBtn = document.getElementById('open-result');
+      var extBtn = document.getElementById('open-external');
+      openBtn.style.display = 'inline-flex';
+      openBtn.textContent = labelInApp || 'Open Link';
+      openBtn.onclick = function (e) {
+        e.preventDefault();
+        // Prefer external so AppsGeyser / WebView does not trap the page
+        openExternally(url);
+      };
+      extBtn.style.display = 'inline-flex';
+      extBtn.textContent = labelExternal || 'Open in Browser';
+      extBtn.onclick = function (e) {
+        e.preventDefault();
+        openExternally(url);
+      };
     }
 
     function showScanResult(text) {
+      vibrateOnScan();
       const box = document.getElementById('scan-result');
       const resultEl = document.getElementById('result-text');
       const openBtn = document.getElementById('open-result');
+      const extBtn = document.getElementById('open-external');
       resetScanPanels();
       box.classList.add('show');
 
       // Password-protected: universal data:text/html unlock page
+      // Do NOT auto-open (WebView wrappers get stuck on "Redirecting to App")
       if (text && text.indexOf('data:text/html') === 0) {
         document.getElementById('scan-result-title').textContent = 'Protected Photo';
-        resultEl.textContent = 'Password page detected. Enter PIN below or open the password page.';
+        resultEl.textContent = 'Password-protected photo. Enter the PIN below, or open the password page in your browser.';
         resultEl.style.display = 'block';
-        openBtn.style.display = 'inline-flex';
-        openBtn.textContent = 'Open password page';
-        openBtn.onclick = function () {
-          window.open(text, '_blank', 'noopener,noreferrer');
-        };
         document.getElementById('copy-result').style.display = 'none';
-        try { window.open(text, '_blank', 'noopener,noreferrer'); } catch (e) {}
+        wireOpenButtons(text, 'Open password page', 'Open in Browser');
         try {
           var m = text.match(/var C="([A-Za-z0-9\-_]+)"/);
           if (m && m[1]) {
@@ -1742,6 +1839,7 @@
         resultEl.textContent = 'Enter the 4-digit password to load the photo.';
         resultEl.style.display = 'block';
         openBtn.style.display = 'none';
+        extBtn.style.display = 'none';
         document.getElementById('copy-result').style.display = 'none';
         showToast('Protected QR — enter password');
         return;
@@ -1756,6 +1854,7 @@
         resultEl.textContent = 'Enter the 4-digit password to view the photo stored on this device.';
         resultEl.style.display = 'block';
         openBtn.style.display = 'none';
+        extBtn.style.display = 'none';
         document.getElementById('copy-result').style.display = 'none';
         showToast('Protected QR — enter password');
         return;
@@ -1770,6 +1869,7 @@
         resultEl.textContent = 'Content is locked. Enter the 4-digit password set by the creator.';
         resultEl.style.display = 'block';
         openBtn.style.display = 'none';
+        extBtn.style.display = 'none';
         document.getElementById('copy-result').style.display = 'none';
         showToast('Protected QR — enter password to unlock');
         return;
@@ -1779,13 +1879,15 @@
       resultEl.textContent = text;
       resultEl.style.display = 'block';
 
-      const isUrl = /^https?:\/\//i.test(text) || /^www\./i.test(text);
-      openBtn.style.display = isUrl ? 'inline-flex' : 'none';
-      openBtn.onclick = () => {
-        let url = text;
+      var isUrl = /^https?:\/\//i.test(text) || /^www\./i.test(text) || /^mailto:/i.test(text) || /^tel:/i.test(text);
+      if (isUrl) {
+        var url = text;
         if (/^www\./i.test(url)) url = 'https://' + url;
-        window.open(url, '_blank', 'noopener,noreferrer');
-      };
+        wireOpenButtons(url, 'Open Link', 'Open in Browser');
+      } else {
+        openBtn.style.display = 'none';
+        extBtn.style.display = 'none';
+      }
 
       showToast('QR code scanned!');
     }
