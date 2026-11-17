@@ -920,10 +920,10 @@
 
           <div class="style-row">
             <div class="form-group">
-              <label>Foreground</label>
+              <label>Foreground (Gold only)</label>
               <div class="color-input-wrap">
-                <input type="color" id="fg-color" value="#1a1a1a" />
-                <input type="text" id="fg-hex" value="#1a1a1a" maxlength="7" />
+                <input type="color" id="fg-color" value="#c9a227" disabled title="QR modules are always gold" />
+                <input type="text" id="fg-hex" value="#c9a227" maxlength="7" readonly title="QR modules are always gold" />
               </div>
             </div>
             <div class="form-group">
@@ -1484,8 +1484,11 @@
         return;
       }
 
-      const fg = fgColor.value;
-      const bg = bgColor.value;
+      // All QR codes use gold modules only
+      const fg = '#c9a227';
+      const bg = bgColor.value || '#ffffff';
+      if (fgColor) fgColor.value = fg;
+      if (fgHex) fgHex.value = fg;
 
       const holder = document.createElement('div');
       holder.style.cssText = 'position:absolute;left:-9999px;top:0;';
